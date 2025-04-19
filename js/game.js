@@ -1,6 +1,59 @@
+// ==========================================
+// CONFIGURACIÓN DEL TABLERO Y VARIABLES GLOBALES
+// ==========================================
+
 // Variables para el tamaño del tablero
 let NUM_FILAS = 8;
 let NUM_COLUMNAS = 8;
+
+// ==========================================
+// CONSTANTES DEL JUEGO
+// ==========================================
+
+// Colores disponibles para las fichas (actualmente no se usan, pero están disponibles)
+const COLORES = ['#ff69b4', '#ffb6c1', '#ffc0cb', '#db7093', '#ff1493'];
+
+// Imágenes disponibles para las fichas normales
+const IMAGENES = [
+    'images/chritmas-doro.png',    // Doro navideño
+    'images/doro-imagen.png',      // Doro normal
+    'images/doro-lemon.png',       // Doro limón
+    'images/piggy.png',            // Cerdito
+    'images/chibi-doro.png'        // Doro chibi
+];
+
+// Power-ups disponibles en el juego
+const POWER_UPS = {
+    FILA: 'images/fila-card-power.png',      // Power-up que elimina una fila/columna
+    SAME: 'images/same-card-power.png',      // Power-up que elimina todas las fichas del mismo tipo
+    DORO_MINI: 'images/doro-mini-game.gif',  // Power-up que aparece al hacer match de 4
+    SUPER_DORO: 'images/super-doro.gif'      // Power-up que aparece al hacer match de 5
+};
+
+// Probabilidades de aparición de power-ups
+const POWER_UP_CHANCES = {
+    FILA: 0.04,   // 4% de probabilidad
+    SAME: 0.01    // 1% de probabilidad
+};
+
+// Efectos de sonido del juego
+const SOUNDS = {
+    COMBO: new Audio('sounds/combos.mp3'),         // Sonido para combos normales
+    SPECIAL: new Audio('sounds/combo-momoi.mp3')   // Sonido para combos especiales
+};
+
+// ==========================================
+// VARIABLES DEL JUEGO
+// ==========================================
+
+let tablero = [];              // Array que contiene el estado actual del tablero
+let puntuacion = 0;           // Puntuación actual del jugador
+let tiempoRestante = 60;      // Tiempo restante en segundos
+let metaActual = 1000;        // Meta de puntos actual
+let nivelActual = 1;          // Nivel actual del jugador
+let combosConsecutivos = 0;   // Contador de combos consecutivos
+let seleccionado = null;      // Índice de la ficha seleccionada actualmente
+let metas = [1000, 2500, 5000, 8000, 12000]; // Metas de puntos para cada nivel
 
 // Función para ajustar el tamaño del tablero según el ancho de la pantalla
 const ajustarTamañoTablero = () => {
@@ -22,41 +75,6 @@ window.addEventListener('resize', () => {
         reiniciarJuego();
     }
 });
-
-const COLORES = ['#ff69b4', '#ffb6c1', '#ffc0cb', '#db7093', '#ff1493'];
-const IMAGENES = [
-    'images/chritmas-doro.png',
-    'images/doro-imagen.png',
-    'images/doro-lemon.png',
-    'images/piggy.png',
-    'images/chibi-doro.png'
-];
-
-const POWER_UPS = {
-    FILA: 'images/fila-card-power.png',
-    SAME: 'images/same-card-power.png'
-};
-
-// Reducir probabilidad del power-up same-card (1%)
-const POWER_UP_CHANCES = {
-    FILA: 0.04,
-    SAME: 0.01
-};
-
-const SOUNDS = {
-    COMBO: new Audio('sounds/combos.mp3'),
-    SPECIAL: new Audio('sounds/combo-momoi.mp3')
-};
-
-// Variable para contar combos consecutivos
-let combosConsecutivos = 0;
-
-let tablero = [];
-let puntuacion = 0;
-let tiempoRestante = 60;
-let metaActual = 1000;
-let nivelActual = 1;
-let metas = [1000, 2500, 5000, 8000, 12000]; // Metas para cada nivel
 
 const generarTablero = () => {
     tablero = [];
@@ -389,39 +407,143 @@ const detectarCoincidencias = () => {
     // Función recursiva para detectar todos los combos en un turno
     const detectarTodosLosCombos = () => {
         encontrados.clear();
+        let coincidencias5 = new Set();
+        let coincidencias4 = new Set();
+        let coincidencias3 = new Set();
 
         // Coincidencias en filas
         for (let fila = 0; fila < NUM_FILAS; fila++) {
-            for (let col = 0; col < NUM_COLUMNAS - 2; col++) {
+            for (let col = 0; col < NUM_COLUMNAS - 4; col++) {
                 const i = fila * NUM_COLUMNAS + col;
                 if (
                     tablero[i] &&
                     IMAGENES.includes(tablero[i]) &&
                     tablero[i] === tablero[i + 1] &&
-                    tablero[i] === tablero[i + 2]
+                    tablero[i] === tablero[i + 2] &&
+                    tablero[i] === tablero[i + 3] &&
+                    tablero[i] === tablero[i + 4]
                 ) {
-                    encontrados.add(i);
-                    encontrados.add(i + 1);
-                    encontrados.add(i + 2);
+                    // Coincidencia de 5
+                    for (let j = 0; j < 5; j++) {
+                        coincidencias5.add(i + j);
+                    }
                 }
             }
         }
 
-        // Coincidencias en columnas
+        // Coincidencias en columnas de 5
         for (let col = 0; col < NUM_COLUMNAS; col++) {
-            for (let fila = 0; fila < NUM_FILAS - 2; fila++) {
+            for (let fila = 0; fila < NUM_FILAS - 4; fila++) {
                 const i = fila * NUM_COLUMNAS + col;
                 if (
                     tablero[i] &&
                     IMAGENES.includes(tablero[i]) &&
                     tablero[i] === tablero[i + NUM_COLUMNAS] &&
-                    tablero[i] === tablero[i + NUM_COLUMNAS * 2]
+                    tablero[i] === tablero[i + NUM_COLUMNAS * 2] &&
+                    tablero[i] === tablero[i + NUM_COLUMNAS * 3] &&
+                    tablero[i] === tablero[i + NUM_COLUMNAS * 4]
                 ) {
-                    encontrados.add(i);
-                    encontrados.add(i + NUM_COLUMNAS);
-                    encontrados.add(i + NUM_COLUMNAS * 2);
+                    // Coincidencia de 5
+                    for (let j = 0; j < 5; j++) {
+                        coincidencias5.add(i + (j * NUM_COLUMNAS));
+                    }
                 }
             }
+        }
+
+        // Si no hay coincidencias de 5, buscar coincidencias de 4
+        if (coincidencias5.size === 0) {
+            // Filas de 4
+            for (let fila = 0; fila < NUM_FILAS; fila++) {
+                for (let col = 0; col < NUM_COLUMNAS - 3; col++) {
+                    const i = fila * NUM_COLUMNAS + col;
+                    if (
+                        tablero[i] &&
+                        IMAGENES.includes(tablero[i]) &&
+                        tablero[i] === tablero[i + 1] &&
+                        tablero[i] === tablero[i + 2] &&
+                        tablero[i] === tablero[i + 3]
+                    ) {
+                        // Coincidencia de 4
+                        for (let j = 0; j < 4; j++) {
+                            coincidencias4.add(i + j);
+                        }
+                    }
+                }
+            }
+
+            // Columnas de 4
+            for (let col = 0; col < NUM_COLUMNAS; col++) {
+                for (let fila = 0; fila < NUM_FILAS - 3; fila++) {
+                    const i = fila * NUM_COLUMNAS + col;
+                    if (
+                        tablero[i] &&
+                        IMAGENES.includes(tablero[i]) &&
+                        tablero[i] === tablero[i + NUM_COLUMNAS] &&
+                        tablero[i] === tablero[i + NUM_COLUMNAS * 2] &&
+                        tablero[i] === tablero[i + NUM_COLUMNAS * 3]
+                    ) {
+                        // Coincidencia de 4
+                        for (let j = 0; j < 4; j++) {
+                            coincidencias4.add(i + (j * NUM_COLUMNAS));
+                        }
+                    }
+                }
+            }
+        }
+
+        // Si no hay coincidencias de 4 o 5, buscar coincidencias de 3
+        if (coincidencias5.size === 0 && coincidencias4.size === 0) {
+            // Filas de 3
+            for (let fila = 0; fila < NUM_FILAS; fila++) {
+                for (let col = 0; col < NUM_COLUMNAS - 2; col++) {
+                    const i = fila * NUM_COLUMNAS + col;
+                    if (
+                        tablero[i] &&
+                        IMAGENES.includes(tablero[i]) &&
+                        tablero[i] === tablero[i + 1] &&
+                        tablero[i] === tablero[i + 2]
+                    ) {
+                        for (let j = 0; j < 3; j++) {
+                            coincidencias3.add(i + j);
+                        }
+                    }
+                }
+            }
+
+            // Columnas de 3
+            for (let col = 0; col < NUM_COLUMNAS; col++) {
+                for (let fila = 0; fila < NUM_FILAS - 2; fila++) {
+                    const i = fila * NUM_COLUMNAS + col;
+                    if (
+                        tablero[i] &&
+                        IMAGENES.includes(tablero[i]) &&
+                        tablero[i] === tablero[i + NUM_COLUMNAS] &&
+                        tablero[i] === tablero[i + NUM_COLUMNAS * 2]
+                    ) {
+                        for (let j = 0; j < 3; j++) {
+                            coincidencias3.add(i + (j * NUM_COLUMNAS));
+                        }
+                    }
+                }
+            }
+        }
+
+        // Procesar coincidencias y crear power-ups
+        if (coincidencias5.size > 0) {
+            encontrados = coincidencias5;
+            // Crear SUPER_DORO power-up en el centro de la coincidencia
+            const centro = Array.from(coincidencias5)[Math.floor(coincidencias5.size / 2)];
+            tablero[centro] = POWER_UPS.SUPER_DORO;
+            coincidencias5.delete(centro);
+        } else if (coincidencias4.size > 0) {
+            encontrados = coincidencias4;
+            // Crear DORO_MINI power-up en el centro de la coincidencia
+            const centro = Array.from(coincidencias4)[Math.floor(coincidencias4.size / 2)];
+            tablero[centro] = POWER_UPS.DORO_MINI;
+            coincidencias4.delete(centro);
+        } else if (coincidencias3.size > 0) {
+            encontrados = coincidencias3;
         }
 
         if (encontrados.size > 0) {
@@ -434,8 +556,10 @@ const detectarCoincidencias = () => {
             }
 
             encontrados.forEach(i => {
-                tablero[i] = null;
-                mostrarEfectoCombo(i);
+                if (tablero[i] !== POWER_UPS.SUPER_DORO && tablero[i] !== POWER_UPS.DORO_MINI) {
+                    tablero[i] = null;
+                    mostrarEfectoCombo(i);
+                }
             });
 
             puntuacion += encontrados.size * 10;
@@ -456,8 +580,6 @@ const detectarCoincidencias = () => {
         if (combosEnEsteTurno > 0) {
             combosConsecutivos = Math.max(combosConsecutivos, combosEnEsteTurno);
             actualizarContadorCombos(combosConsecutivos);
-
-            // Verificar si se alcanzó la meta
             verificarMeta();
         } else {
             combosConsecutivos = 0;
@@ -537,7 +659,6 @@ const rellenarHuecos = () => {
     }, maxDelay * 1000);
 };
 
-let seleccionado = null;
 const manejarClick = (index) => {
     const tile = document.querySelector(`[data-index='${index}']`);
     

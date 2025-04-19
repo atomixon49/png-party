@@ -5,8 +5,17 @@
 :root {
     --num-columns: 8;
     --tile-size: 65px;
+    --board-color: #ffd4e5;     /* Color de fondo del tablero */
+    --border-color: #ff69b4;    /* Color del borde */
     --board-gap: 10px;
     --container-padding: 25px;
+}
+
+/* Reseteo de estilos básicos */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {

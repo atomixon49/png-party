@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -7,7 +7,8 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Juego Estilo Candy Crush</title>
+    <!-- Título del juego de combinación de fichas -->
+    <title>PNG Party - Juego de Combinación</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -17,31 +18,39 @@
     <div class="ribbon ribbon-bottom-left"></div>
     <div class="ribbon ribbon-bottom-right"></div>
 
+    <!-- Contenedor principal del juego -->
     <div id="game-container">
         <h1>Juego Estilo Candy Crush</h1>
         
+        <!-- Panel superior con información del juego -->
         <div class="game-stats">
+            <!-- Temporizador de la partida -->
             <div class="stat-container" id="timer-container">
                 <span class="stat-label">Tiempo</span>
                 <span class="stat-value" id="time">60</span>
             </div>
+            <!-- Puntuación actual del jugador -->
             <div class="stat-container">
                 <span class="stat-label">Puntos</span>
                 <span class="stat-value" id="score">0</span>
             </div>
+            <!-- Meta actual que debe alcanzar el jugador -->
             <div class="stat-container">
                 <span class="stat-label">Meta</span>
                 <span class="stat-value" id="current-goal">1000</span>
             </div>
         </div>
 
+        <!-- Contador de combos consecutivos -->
         <div id="combo-counter">
             <span>Combo × </span>
             <span id="combo">0</span>
         </div>
 
+        <!-- Tablero del juego donde aparecen las fichas -->
         <div id="game-board"></div>
     </div>
+    <!-- Scripts del juego -->
     <script src="js/game.js"></script>
 </body>
 </html>
