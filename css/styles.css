@@ -232,7 +232,7 @@ h1::after {
 }
 
 .tile.matching {
-    animation: tile-match 0.4s ease-out forwards;
+    animation: tile-match 0.6s ease-out forwards;
     z-index: 2;
 }
 
@@ -286,10 +286,10 @@ h1::after {
         filter: brightness(1);
         opacity: 1;
     }
-    50% {
-        transform: scale(1.2);
+    40% {
+        transform: scale(1.3);
         filter: brightness(1.5);
-        opacity: 0.8;
+        opacity: 0.9;
     }
     100% {
         transform: scale(0);
@@ -400,29 +400,44 @@ h1::after {
     }
 }
 
-/* Estilos para power-ups */
+/* Estilos para power-ups (versión sutil) */
 .tile[data-power-up="true"] {
-    animation: power-up-glow 1.5s ease-in-out infinite;
-    border: 3px solid gold;
-    box-shadow:
-        0 0 10px rgba(255, 215, 0, 0.5),
-        0 0 20px rgba(255, 215, 0, 0.3);
+    border: 2px solid rgba(255, 182, 193, 0.4); /* Rosa más transparente */
+    box-shadow: 0 0 3px rgba(255, 182, 193, 0.2);
+    position: relative;
 }
 
+.tile[data-power-up="true"]::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: inherit;
+    background: radial-gradient(circle at center, rgba(255, 182, 193, 0.1), transparent 70%);
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.tile[data-power-up="true"]:hover {
+    border-color: rgba(255, 182, 193, 0.6);
+    box-shadow: 0 0 5px rgba(255, 182, 193, 0.3);
+}
+
+/* Eliminar animaciones brillantes previas */
 @keyframes power-up-glow {
-    0%, 100% {
-        transform: scale(1);
-        filter: brightness(1);
+    0%, 100% { 
+        box-shadow: 0 0 3px rgba(255, 182, 193, 0.2);
     }
-    50% {
-        transform: scale(1.1);
-        filter: brightness(1.3);
+    50% { 
+        box-shadow: 0 0 4px rgba(255, 182, 193, 0.3);
     }
 }
 
 /* Efecto para el power-up de fila */
 .row-clear {
-    animation: row-clear-effect 0.5s ease-out forwards;
+    animation: row-clear-effect 0.8s ease-out forwards;
 }
 
 @keyframes row-clear-effect {
@@ -430,9 +445,9 @@ h1::after {
         transform: scale(1);
         filter: brightness(1);
     }
-    50% {
-        transform: scale(1.2);
-        filter: brightness(1.5);
+    40% {
+        transform: scale(1.3);
+        filter: brightness(1.8);
     }
     100% {
         transform: scale(0);
@@ -441,22 +456,77 @@ h1::after {
 }
 
 /* Efecto para el power-up same-card */
-.same-clear {
-    animation: same-clear-effect 0.5s ease-out forwards;
-}
-
 @keyframes same-clear-effect {
     0% {
         transform: rotate(0deg) scale(1);
-        filter: hue-rotate(0deg);
+        filter: hue-rotate(0deg) brightness(1);
     }
-    50% {
-        transform: rotate(180deg) scale(1.3);
-        filter: hue-rotate(180deg);
+    40% {
+        transform: rotate(180deg) scale(1.4);
+        filter: hue-rotate(180deg) brightness(1.8);
     }
     100% {
         transform: rotate(360deg) scale(0);
-        filter: hue-rotate(360deg);
+        filter: hue-rotate(360deg) brightness(2);
+    }
+}
+
+.same-clear {
+    animation: same-clear-effect 0.6s ease-out forwards;
+}
+
+/* Animaciones para Momoi especial */
+@keyframes momoi-entrada {
+    0% {
+        opacity: 0;
+        transform: translateY(-50%) scale(0.3);
+    }
+    50% {
+        opacity: 1;
+        transform: translateY(-50%) scale(1.1);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(-50%) scale(1);
+    }
+}
+
+@keyframes momoi-salida {
+    0% {
+        opacity: 1;
+        transform: translateY(-50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-50%) scale(0.3);
+    }
+}
+
+.momoi-special {
+    position: fixed;
+    top: 50%;
+    height: 300px;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.momoi-special.left {
+    left: 0;
+    animation: momoi-entrada 0.5s ease-out forwards;
+}
+
+.momoi-special.right {
+    right: 0;
+    animation: momoi-entrada 0.5s ease-out forwards;
+}
+
+.momoi-special.salida {
+    animation: momoi-salida 0.5s ease-out forwards !important;
+}
+
+@media (max-width: 480px) {
+    .momoi-special {
+        height: 200px;
     }
 }
 
@@ -741,4 +811,241 @@ h1::after {
         transform: scale(1.15);
         z-index: 10;
     }
+}
+
+/* Doro Runner Mini-game */
+.doro-runner-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    height: 250px;
+    background-image: url('../images/minigame/background.jpeg');
+    background-size: cover;
+    background-position: 0 0;
+    border: 8px solid;
+    border-image: linear-gradient(45deg, #ff69b4, #87CEEB, #FFB6C1, #ff69b4) 1;
+    border-radius: 15px;
+    overflow: hidden;
+    z-index: 1000;
+    box-shadow: 
+        0 0 20px rgba(0, 0, 0, 0.3),
+        inset 0 0 15px rgba(255, 255, 255, 0.5);
+    animation: scroll-background 20s linear infinite;
+}
+
+@keyframes scroll-background {
+    from { background-position: 0 0; }
+    to { background-position: -1000px 0; }
+}
+
+.doro-runner {
+    position: absolute;
+    left: 50px;
+    bottom: 30px; /* Bajado un poco para mejor consistencia */
+    width: 45px; /* Reducido para mejor colisión */
+    height: 45px;
+    background-image: url('../images/doro-mini-game.gif');
+    background-size: contain;
+    background-repeat: no-repeat;
+    transform: scaleX(-1);
+    filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.3));
+    z-index: 10;
+}
+
+@keyframes doro-jump {
+    0% { transform: scaleX(-1) translateY(0); }
+    45% { transform: scaleX(-1) translateY(-65px); }
+    55% { transform: scaleX(-1) translateY(-65px); }
+    100% { transform: scaleX(-1) translateY(0); }
+}
+
+.doro-runner.jump {
+    animation: doro-jump 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.doro-obstacle {
+    position: absolute;
+    bottom: 30px;
+    width: 35px; /* Reducido para mejor colisión */
+    height: 35px;
+    background-image: url('../images/minigame/obstacles.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    right: -50px;
+    z-index: 5;
+    animation: move-left 1.5s linear; /* Más rápido: 1.5s en lugar de 2s */
+}
+
+.doro-star {
+    position: absolute;
+    bottom: 70px; /* Más alto que los obstáculos */
+    width: 35px;
+    height: 35px;
+    background-image: url('../images/minigame/coin.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    right: -50px;
+    z-index: 5;
+    animation: move-left 1.5s linear, coin-spin 1s linear infinite; /* Más rápido */
+}
+
+.time-powerup {
+    position: absolute;
+    bottom: 70px;
+    width: 35px;
+    height: 35px;
+    font-size: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    right: -50px;
+    z-index: 5;
+    color: #00ffff;
+    text-shadow: 0 0 5px #00ffff;
+    animation: move-left 1.5s linear, powerup-pulse 1s ease-in-out infinite;
+}
+
+.time-powerup::before {
+    content: '⏰';
+}
+
+.time-powerup.collected {
+    animation: time-collect 0.4s ease-out forwards !important;
+}
+
+@keyframes powerup-pulse {
+    0%, 100% { 
+        transform: scale(1);
+        filter: drop-shadow(0 0 3px #00ffff);
+    }
+    50% { 
+        transform: scale(1.2);
+        filter: drop-shadow(0 0 8px #00ffff);
+    }
+}
+
+@keyframes time-collect {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+        filter: brightness(1) drop-shadow(0 0 3px #00ffff);
+    }
+    60% {
+        transform: scale(1.5) translateY(-20px);
+        opacity: 0.8;
+        filter: brightness(1.5) drop-shadow(0 0 8px #00ffff);
+    }
+    100% {
+        transform: scale(0) translateY(-40px);
+        opacity: 0;
+        filter: brightness(2) drop-shadow(0 0 12px #00ffff);
+    }
+}
+
+@keyframes move-left {
+    from { right: -50px; }
+    to { right: calc(100% + 50px); }
+}
+
+@keyframes coin-spin {
+    from { transform: rotateY(0deg); }
+    to { transform: rotateY(360deg); }
+}
+
+.doro-star.collected {
+    animation: coin-collect 0.3s ease-out forwards !important;
+}
+
+@keyframes coin-collect {
+    0% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2) translateY(-30px) rotate(180deg);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(0) translateY(-50px) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+.doro-obstacle.hit {
+    animation: obstacle-hit 0.3s ease-out forwards !important;
+}
+
+@keyframes obstacle-hit {
+    0% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.3) translateY(-20px) rotate(45deg);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(0) translateY(-40px) rotate(90deg);
+        opacity: 0;
+    }
+}
+
+.doro-runner-score, .doro-runner-timer {
+    position: absolute;
+    top: 15px;
+    padding: 8px 15px;
+    color: #fff;
+    font-size: 28px;
+    font-weight: bold;
+    font-family: 'Fredoka', sans-serif;
+    background: rgba(255, 105, 180, 0.8);
+    border-radius: 25px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    transition: transform 0.2s;
+}
+
+.doro-runner-score {
+    right: 15px;
+}
+
+.doro-runner-score::before {
+    content: '⭐';
+    margin-right: 5px;
+    font-size: 24px;
+}
+
+.doro-runner-timer {
+    left: 15px;
+}
+
+.doro-runner-timer::before {
+    content: '⏱️';
+    margin-right: 5px;
+    font-size: 24px;
+}
+
+.doro-runner-score.update {
+    animation: score-update 0.3s ease-out;
+}
+
+@keyframes score-update {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.runner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(3px);
+    z-index: 999;
 }
