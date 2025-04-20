@@ -21,7 +21,11 @@ const ASSETS = {
     },
     SOUNDS: {
         COMBO: new Audio('sounds/combos.mp3'),
-        SPECIAL: new Audio('sounds/combo-momoi.mp3')
+        SPECIAL: new Audio('sounds/combo-momoi.mp3'),
+        COIN: new Audio('sounds/coin.mp3'),
+        OBSTACLE: new Audio('sounds/obstacle.mp3'),
+        MATCH: new Audio('sounds/matches.mp3'),
+        EXPLOSION: new Audio('sounds/explosion.mp3')
     }
 };
 

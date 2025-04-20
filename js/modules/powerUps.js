@@ -96,6 +96,7 @@ class PowerUpManager {
         if (matchSize === 5) {
             return ASSETS.POWER_UPS.SUPER_DORO;
         } else if (matchSize === 4) {
+            // Asegurarnos de que el power-up del mini-juego aparezca
             return ASSETS.POWER_UPS.DORO_MINI;
         }
         return null;
@@ -103,14 +104,14 @@ class PowerUpManager {
 
     static activateMatchPowerUp(board, index, matchSize) {
         if (matchSize === 4) {
-            // Asegurar que el power-up de mini-juego desaparezca
-            board[index] = null;
-            
             return new Promise((resolve) => {
+                // Mantener la ficha del power-up visible hasta que inicie el mini-juego
                 const doroRunner = new DoroRunner((score) => {
-                    // Por cada punto ganado en el mini-juego, eliminar una ficha adicional
                     const affectedIndices = [];
                     const NUM_COLS = Math.sqrt(board.length);
+                    
+                    // Eliminar la ficha del power-up después de que el mini-juego inicie
+                    board[index] = null;
                     
                     // Buscar fichas aleatorias para eliminar basado en el puntaje
                     for (let i = 0; i < score; i++) {
@@ -342,6 +343,10 @@ class DoroRunner {
     handleObstacleCollision(obstacle) {
         if (this.isInvulnerable) return;
         
+        // Reproducir sonido de obstáculo
+        ASSETS.SOUNDS.OBSTACLE.currentTime = 0;
+        ASSETS.SOUNDS.OBSTACLE.play().catch(e => console.log("Error playing obstacle sound:", e));
+        
         // Restar tiempo
         this.timeLeft = Math.max(0, this.timeLeft - this.timePenalty);
         this.updateDisplay();
@@ -369,6 +374,12 @@ class DoroRunner {
     }
 
     collectStar(star) {
+        // Reproducir sonido de moneda si no es power-up de tiempo
+        if (!star.classList.contains('time-powerup')) {
+            ASSETS.SOUNDS.COIN.currentTime = 0;
+            ASSETS.SOUNDS.COIN.play().catch(e => console.log("Error playing coin sound:", e));
+        }
+        
         // Añadir clase de animación antes de cualquier otra acción
         star.classList.add('collected');
         
