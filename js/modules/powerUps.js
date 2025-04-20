@@ -29,6 +29,8 @@ class PowerUpManager {
         
         return resultado;
     }
+    
+
 
     static activateFilaPowerUp(board, index, seleccionado) {
         const NUM_COLUMNAS = Math.sqrt(board.length);
@@ -101,6 +103,9 @@ class PowerUpManager {
 
     static activateMatchPowerUp(board, index, matchSize) {
         if (matchSize === 4) {
+            // Asegurar que el power-up de mini-juego desaparezca
+            board[index] = null;
+            
             return new Promise((resolve) => {
                 const doroRunner = new DoroRunner((score) => {
                     // Por cada punto ganado en el mini-juego, eliminar una ficha adicional
@@ -117,6 +122,11 @@ class PowerUpManager {
                             const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
                             affectedIndices.push(randomIndex);
                         }
+                    }
+                    
+                    // Asegurar que el power-up se incluya en los índices afectados
+                    if (!affectedIndices.includes(index)) {
+                        affectedIndices.push(index);
                     }
                     
                     resolve({
